@@ -41,12 +41,12 @@ internal class Properties {
                     case " ","\t","\n","\r":
                         // is blank section
                         type = .begin
-                        current = contents.index(current, offsetBy: 1)
+                        current = contents.index(after: current)
                     
                     case "#","!":
                         // is comment section
                         type = .comment
-                        current = contents.index(current, offsetBy: 1)
+                        current = contents.index(after: current)
                         
                     default:
                         // is key section
@@ -56,38 +56,38 @@ internal class Properties {
                     switch ch {
                     case "\\":
                         type = .key_escape
-                        current = contents.index(current, offsetBy: 1)
+                        current = contents.index(after: current)
                         
                     case " ","\t",":","=":
                         type = .delimiter
-                        current = contents.index(current, offsetBy: 1)
+                        current = contents.index(after: current)
 
                     case "\r","\n":
                         // key associated with an empty string element
                         properties[key] = element
                         key.removeAll()
                         type = .begin
-                        current = contents.index(current, offsetBy: 1)
+                        current = contents.index(after: current)
 
                     default:
                         // is key contents
                         key.append(ch)
-                        current = contents.index(current, offsetBy: 1)
+                        current = contents.index(after: current)
                     }
                 case .key_escape:
                     switch ch {
                     case " ","\t",":","=","\\":
                         key.append(ch)
                         type = .key
-                        current = contents.index(current, offsetBy: 1)
+                        current = contents.index(after: current)
                         
                     case "\r":
                         type = .key_continue2
-                        current = contents.index(current, offsetBy: 1)
+                        current = contents.index(after: current)
                         
                     case "\n":
                         type = .key_continue
-                        current = contents.index(current, offsetBy: 1)
+                        current = contents.index(after: current)
                         
                     default:
                         break
@@ -96,7 +96,7 @@ internal class Properties {
                     switch ch {
                     case " ","\t":
                         // is blank
-                        current = contents.index(current, offsetBy: 1)
+                        current = contents.index(after: current)
 
                     default:
                         type = .key
@@ -105,7 +105,7 @@ internal class Properties {
                     switch ch {
                     case "\n":
                         type = .key_continue
-                        current = contents.index(current, offsetBy: 1)
+                        current = contents.index(after: current)
 
                     default:
                         type = .key_continue
@@ -114,7 +114,7 @@ internal class Properties {
                     switch ch {
                     case " ","\t",":","=":
                         // is blank
-                        current = contents.index(current, offsetBy: 1)
+                        current = contents.index(after: current)
 
                     default:
                         type = .element
@@ -123,7 +123,7 @@ internal class Properties {
                     switch ch {
                     case "\\":
                         type = .element_escape
-                        current = contents.index(current, offsetBy: 1)
+                        current = contents.index(after: current)
 
                     case "\r","\n":
                         // key associated with an empty string element
@@ -131,33 +131,33 @@ internal class Properties {
                         key.removeAll()
                         element.removeAll()
                         type = .begin
-                        current = contents.index(current, offsetBy: 1)
+                        current = contents.index(after: current)
 
                     default:
                         // is element contents
                         element.append(ch)
-                        current = contents.index(current, offsetBy: 1)
+                        current = contents.index(after: current)
                     }
                 case .element_escape:
                     switch ch {
                     case "\n":
                         type = .element_continue
-                        current = contents.index(current, offsetBy: 1)
+                        current = contents.index(after: current)
 
                     case "\r":
                         type = .element_continue2
-                        current = contents.index(current, offsetBy: 1)
+                        current = contents.index(after: current)
                         
                     default:
                         // is element contents
                         element.append(ch)
-                        current = contents.index(current, offsetBy: 1)
+                        current = contents.index(after: current)
                     }
                 case .element_continue:
                     switch ch {
                     case " ","\t":
                         // is blank
-                        current = contents.index(current, offsetBy: 1)
+                        current = contents.index(after: current)
                         
                     default:
                         type = .element
@@ -167,7 +167,7 @@ internal class Properties {
                     case "\n":
                         // is blank line
                         type = .element_continue
-                        current = contents.index(current, offsetBy: 1)
+                        current = contents.index(after: current)
 
                     default:
                         type = .element_continue
@@ -177,11 +177,11 @@ internal class Properties {
                     case "\r","\n":
                         // comment content is end
                         type = .begin
-                        current = contents.index(current, offsetBy: 1)
+                        current = contents.index(after: current)
                         
                     default:
                         // ignore
-                        current = contents.index(current, offsetBy: 1)
+                        current = contents.index(after: current)
                     }
                 }
             }

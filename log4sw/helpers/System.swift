@@ -8,6 +8,37 @@
 
 import Cocoa
 
+
+// java.version Java 运行时环境版本
+// java.vendor Java 运行时环境供应商
+// java.vendor.url Java 供应商的 URL
+// java.home Java 安装目录
+// java.vm.specification.version Java 虚拟机规范版本
+// java.vm.specification.vendor Java 虚拟机规范供应商
+// java.vm.specification.name Java 虚拟机规范名称
+// java.vm.version Java 虚拟机实现版本
+// java.vm.vendor Java 虚拟机实现供应商
+// java.vm.name Java 虚拟机实现名称
+// java.specification.version Java 运行时环境规范版本
+// java.specification.vendor Java 运行时环境规范供应商
+// java.specification.name Java 运行时环境规范名称
+// java.class.version Java 类格式版本号
+// java.class.path Java 类路径
+// java.library.path 加载库时搜索的路径列表
+// java.io.tmpdir 默认的临时文件路径
+// java.compiler 要使用的 JIT 编译器的名称
+// java.ext.dirs 一个或多个扩展目录的路径
+// os.name 操作系统的名称
+// os.arch 操作系统的架构
+// os.version 操作系统的版本
+// file.separator 文件分隔符（在 UNIX 系统中是"/"）
+// path.separator 路径分隔符（在 UNIX 系统中是":"）
+// line.separator 行分隔符（在 UNIX 系统中是"/n"）
+// user.name 用户的账户名称
+// user.home 用户的主目录
+// user.dir 用户的当前工作目录
+
+
 /**
  The System class contains several useful class fields and methods.
  It cannot be instantiated.
@@ -24,68 +55,29 @@ struct System {
      
      @throws IllegalArgumentException if key is empty.
      */
-    static func env(_ key: String) -> String? {
-        return nil
-//        if (lkey.empty())
-//        {
-//            throw IllegalArgumentException(LOG4CXX_STR("key is empty"));
-//        }
-//
-//        LogString rv;
-//        if (lkey == LOG4CXX_STR("java.io.tmpdir")) {
-//            Pool p;
-//            const char* dir = NULL;
-//            apr_status_t stat = apr_temp_dir_get(&dir, p.getAPRPool());
-//            if (stat == APR_SUCCESS) {
-//                Transcoder::decode(dir, rv);
-//            }
-//            return rv;
-//        }
-//
-//        if (lkey == LOG4CXX_STR("user.dir")) {
-//            Pool p;
-//            char* dir = NULL;
-//            apr_status_t stat = apr_filepath_get(&dir, APR_FILEPATH_NATIVE,
-//                                                 p.getAPRPool());
-//            if (stat == APR_SUCCESS) {
-//                Transcoder::decode(dir, rv);
-//            }
-//            return rv;
-//        }
-//        #if APR_HAS_USER
-//        if (lkey == LOG4CXX_STR("user.home") || lkey == LOG4CXX_STR("user.name")) {
-//            Pool pool;
-//            apr_uid_t userid;
-//            apr_gid_t groupid;
-//            apr_pool_t* p = pool.getAPRPool();
-//            apr_status_t stat = apr_uid_current(&userid, &groupid, p);
-//            if (stat == APR_SUCCESS) {
-//                char* username = NULL;
-//                stat = apr_uid_name_get(&username, userid, p);
-//                if (stat == APR_SUCCESS) {
-//                    if (lkey == LOG4CXX_STR("user.name")) {
-//                        Transcoder::decode(username, rv);
-//                    } else {
-//                        char* dirname = NULL;
-//                        stat = apr_uid_homepath_get(&dirname, username, p);
-//                        if (stat == APR_SUCCESS) {
-//                            Transcoder::decode(dirname, rv);
-//                        }
-//                    }
-//                }
-//            }
-//            return rv;
-//        }
-//        #endif
-//
-//        LOG4CXX_ENCODE_CHAR(key, lkey);
-//        Pool p;
-//        char* value = NULL;
-//        apr_status_t stat = apr_env_get(&value, key.c_str(),
-//                                        p.getAPRPool());
-//        if (stat == APR_SUCCESS) {
-//            Transcoder::decode((const char*) value, rv);
-//        }
-//        return rv;
+    static func env(for key: String) throws -> String? {
+        switch key {
+        case "":
+            throw IllegalArgumentException("key is empty")
+            
+        case "java.io.tmpdir":
+            return NSTemporaryDirectory()
+            
+        case "user.dir":
+            let lenght = 8096
+            let buf = UnsafeMutablePointer<Int8>.allocate(capacity: lenght)
+            
+            guard getcwd(buf, lenght) != nil else {
+                return nil
+            }
+            
+            return String(utf8String: buf)
+
+        default:
+            guard let value = getenv(key) else {
+                return nil
+            }
+            return String(utf8String: value)
+        }
     }
 }

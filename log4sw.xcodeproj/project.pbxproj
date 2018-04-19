@@ -14,6 +14,7 @@
 		0C588FDE2088B37B0050D3C1 /* OptionConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C588FDD2088B37B0050D3C1 /* OptionConverter.swift */; };
 		0C588FE02088B7410050D3C1 /* OptionConverterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C588FDF2088B7410050D3C1 /* OptionConverterTests.swift */; };
 		0C588FE22088BABA0050D3C1 /* System.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C588FE12088BABA0050D3C1 /* System.swift */; };
+		0C588FE42088C2870050D3C1 /* Exception.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C588FE32088C2870050D3C1 /* Exception.swift */; };
 		0C9C9A3D20882AB300334253 /* Properties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9C9A3C20882AB300334253 /* Properties.swift */; };
 		0C9C9A4C208832DF00334253 /* liblog4sw.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0C9C9A3220882A5D00334253 /* liblog4sw.a */; };
 		0C9C9A532088330300334253 /* PropertiesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9C9A522088330300334253 /* PropertiesTests.swift */; };
@@ -49,6 +50,7 @@
 		0C588FDD2088B37B0050D3C1 /* OptionConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptionConverter.swift; sourceTree = "<group>"; };
 		0C588FDF2088B7410050D3C1 /* OptionConverterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptionConverterTests.swift; sourceTree = "<group>"; };
 		0C588FE12088BABA0050D3C1 /* System.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = System.swift; sourceTree = "<group>"; };
+		0C588FE32088C2870050D3C1 /* Exception.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Exception.swift; sourceTree = "<group>"; };
 		0C9C9A3220882A5D00334253 /* liblog4sw.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = liblog4sw.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C9C9A3C20882AB300334253 /* Properties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Properties.swift; sourceTree = "<group>"; };
 		0C9C9A47208832DF00334253 /* log4swTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = log4swTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -104,6 +106,7 @@
 		0C9C9A4020882B5000334253 /* helpers */ = {
 			isa = PBXGroup;
 			children = (
+				0C588FE32088C2870050D3C1 /* Exception.swift */,
 				0C9C9A3C20882AB300334253 /* Properties.swift */,
 				0C588FD92088539B0050D3C1 /* PropertyConfigurator.swift */,
 				0C588FDD2088B37B0050D3C1 /* OptionConverter.swift */,
@@ -216,6 +219,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0C588FE22088BABA0050D3C1 /* System.swift in Sources */,
+				0C588FE42088C2870050D3C1 /* Exception.swift in Sources */,
 				0C9C9A3D20882AB300334253 /* Properties.swift in Sources */,
 				0C588FDE2088B37B0050D3C1 /* OptionConverter.swift in Sources */,
 				0C588FDA2088539C0050D3C1 /* PropertyConfigurator.swift in Sources */,
