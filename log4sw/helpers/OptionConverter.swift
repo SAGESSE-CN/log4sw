@@ -8,27 +8,58 @@
 
 import Foundation
 
-class OptionConverter: NSObject {
+internal extension String {
     
-    /**
-     If <code>value</code> is "true", then <code>true</code> is
-     returned. If <code>value</code> is "false", then
-     <code>true</code> is returned. Otherwise, <code>default</code> is
-     returned.
-     
-     <p>Case of value is unimportant.
-     */
-    
-    static func capacity(_ val: String) -> Int? {
-        guard let unit = val.range(of: "b", options: .caseInsensitive), unit.lowerBound > val.startIndex else {
-            // this is a simple number
-            return Int(val)
+    var sw_escape: String {
+        
+        var sbuf = self
+        var pos = sbuf.startIndex
+        
+        while pos < sbuf.endIndex {
+            
+            var ch = sbuf[pos]
+            var end = sbuf.index(after: pos)
+            
+            guard ch == "\\" else {
+                // ignore
+                pos = end
+                continue
+            }
+            
+            ch = sbuf[end]
+            end = sbuf.index(after: end)
+            
+            switch ch {
+            case "n":
+                ch = "\n"
+                
+            case "r":
+                ch = "\r"
+                
+            case "t":
+                ch = "\t"
+                
+            default:
+                break
+            }
+            
+            sbuf.replaceSubrange(pos ..< end, with: String(ch))
+            pos = sbuf.index(after: pos)
         }
         
-        var pos = val.index(before: unit.lowerBound)
+        return sbuf
+    }
+    
+    var sw_capacity: Int? {
+        guard let unit = self.range(of: "b", options: .caseInsensitive), unit.lowerBound > self.startIndex else {
+            // this is a simple number
+            return Int(self)
+        }
+        
+        var pos = self.index(before: unit.lowerBound)
         var multiplier = 1
         
-        switch val[pos] {
+        switch self[pos] {
         case "k","K":
             multiplier = 1024
             
@@ -48,42 +79,21 @@ class OptionConverter: NSObject {
             pos = unit.lowerBound // no extended unit
         }
         
-        return Int(val[val.startIndex ..< pos]).map {
+        return Int(self[self.startIndex ..< pos]).map {
             return $0 * multiplier
         }
     }
     
-    static func integer(_ val: String) -> Int? {
-        return Int(val)
+    var sw_integer: Int? {
+        return Int(self)
     }
     
-    static func boolean(_ val: String) -> Bool? {
-        return Bool(val.lowercased())
+    var sw_boolean: Bool? {
+        return Bool(self.lowercased())
     }
     
-    static func level(_ val: String) {
-    }
-//    static LevelPtr toLevel(const LogString& value,
-//    const LevelPtr& defaultValue);
-
-
-    /**
-     Find the value corresponding to <code>key</code> in
-     <code>props</code>. Then perform variable substitution on the
-     found value.
-     */
-    static func findAndSubst(_ key: String, in properties: Properties) -> String {
-        let value = properties[key]
-        guard !value.isEmpty else {
-            return value
-        }
-        
-        do {
-            return try substVars(value, in: properties)
-        } catch {
-            print("Bad option value [\(value)].", error)
-            return value
-        }
+    var sw_level: String? {
+        return nil
     }
 
     /**
@@ -120,38 +130,39 @@ class OptionConverter: NSObject {
      @param props The properties from which variable substitution is performed.
      @throws IllegalArgumentException if <code>val</code> is malformed.
      */
-    static func substVars(_ val: String, in properties: Properties) throws -> String {
+    func sw_subst(in properties: Properties) -> String {
         
         var sbuf = ""
-        var pos = val.startIndex
+        var pos = self.startIndex
         
         while true {
-            guard let begin = val.range(of: "${", range: pos ..< val.endIndex) else {
+            guard let begin = self.range(of: "${", range: pos ..< self.endIndex) else {
                 // no more variables
-                guard pos != val.startIndex else {
+                guard pos != self.startIndex else {
                     // this is a simple string
-                    return val
+                    return self
                 }
                 
                 // add the tail string which contails no variables and return the result.
-                return sbuf + val[pos ..< val.endIndex]
+                return sbuf + self[pos ..< self.endIndex]
             }
             
-            guard let end = val.range(of: "}", range: begin.upperBound ..< val.endIndex) else {
-                throw IllegalArgumentException("\"\(val)\" has no closing brace. Opening brace at position \(begin.lowerBound.encodedOffset).")
+            guard let end = self.range(of: "}", range: begin.upperBound ..< self.endIndex) else {
+                print("\"\(self)\" has no closing brace. Opening brace at position \(begin.lowerBound.encodedOffset).")
+                return ""
             }
             
             // copy non variable string
-            sbuf.append(String(val[pos ..< begin.lowerBound]))
+            sbuf.append(String(self[pos ..< begin.lowerBound]))
             pos = end.upperBound
             
-            let key = String(val[begin.upperBound ..< end.lowerBound])
+            let key = String(self[begin.upperBound ..< end.lowerBound])
             guard !key.isEmpty else {
                 continue
             }
             
             // first try in System properties
-            var replacement = try System.env(for: key) ?? ""
+            var replacement = System.env(for: key) ?? ""
             
             // then try props parameter
             if replacement.isEmpty {
@@ -167,7 +178,7 @@ class OptionConverter: NSObject {
             // the where the properties are
             // x1=p1
             // x2=${x1}
-            sbuf.append(try substVars(replacement, in: properties))
+            sbuf.append(replacement.sw_subst(in: properties))
         }
     }
 }

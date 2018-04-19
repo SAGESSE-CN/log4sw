@@ -18,58 +18,84 @@ class OptionConverterTests: XCTestCase {
      * before invoking tests.  ::putenv not reliable.
      */
     func envCheck() {
-        XCTAssertEqual(try? System.env(for: "key1"), "value1")
-        XCTAssertEqual(try? System.env(for: "key2"), "value2")
+        XCTAssertEqual(System.env(for: "key1"), "value1")
+        XCTAssertEqual(System.env(for: "key2"), "value2")
         
-        XCTAssertEqual(try? System.env(for: "TOTO"), "wonderful")
+        XCTAssertEqual(System.env(for: "TOTO"), "wonderful")
     }
     
     func testVarSubst1() {
         envCheck()
         
-        XCTAssertEqual(try? OptionConverter.substVars("hello world.", in: properties), "hello world.")
-        XCTAssertEqual(try? OptionConverter.substVars("hello ${TOTO} world.", in: properties), "hello wonderful world.")
+        XCTAssertEqual("hello world.".sw_subst(in: properties), "hello world.")
+        XCTAssertEqual("hello ${TOTO} world.".sw_subst(in: properties), "hello wonderful world.")
     }
 
     func testVarSubst2() {
         envCheck()
         
-        XCTAssertEqual(try? OptionConverter.substVars("Test2 ${key1} mid ${key2} end.", in: properties), "Test2 value1 mid value2 end.")
+        XCTAssertEqual("Test2 ${key1} mid ${key2} end.".sw_subst(in: properties), "Test2 value1 mid value2 end.")
     }
 
     func testVarSubst3() {
         envCheck()
         
-        XCTAssertEqual(try? OptionConverter.substVars("Test3 ${unset} mid ${key1} end.", in: properties), "Test3  mid value1 end.")
+        XCTAssertEqual("Test3 ${unset} mid ${key1} end.".sw_subst(in: properties), "Test3  mid value1 end.")
+    }
+    
+    func testVarSubst4() {
+        XCTAssertEqual("Test4 ${incomplete ".sw_subst(in: properties), "")
     }
 
-    func testVarSubst4() {
-        do {
-            _ = try OptionConverter.substVars("Test4 ${incomplete ", in: properties)
-            
-            // If the execution is here, the exception is not thrown out
-            XCTFail("Unknown exception")
-        } catch let e as IllegalArgumentException {
-            XCTAssertEqual(e.message, "\"Test4 ${incomplete \" has no closing brace. Opening brace at position 6.")
-        } catch {
-            XCTFail("Unknown exception")
-        }
-    }
-  
     func testVarSubst5() {
         let properties = Properties()
         
         properties["p1"] = "x1"
         properties["p2"] = "${p1}"
         
-        XCTAssertEqual(try? OptionConverter.substVars("${p2}", in: properties), "x1")
+        XCTAssertEqual("${p2}".sw_subst(in: properties), "x1")
     }
 
     func testTmpDir() {
-        XCTAssertEqual(try? OptionConverter.substVars("${java.io.tmpdir}", in: properties), NSTemporaryDirectory())
+        XCTAssertEqual("${java.io.tmpdir}".sw_subst(in: properties), NSTemporaryDirectory())
+    }
+    
+    func testUserName() {
+        XCTAssertEqual("${user.name}".sw_subst(in: properties), NSUserName())
+    }
+    
+    func testUserHome() {
+        XCTAssertEqual("${user.home}".sw_subst(in: properties), NSHomeDirectory())
     }
 
     func testUserDir() {
-        XCTAssertEqual(try? OptionConverter.substVars("${user.dir}", in: properties), try? System.env(for: "user.dir"))
+        XCTAssertEqual("${user.dir}".sw_subst(in: properties), System.env(for: "user.dir"))
+    }
+    
+    func testEscape() {
+        XCTAssertEqual("-\\n-".sw_escape, "-\n-")
+        XCTAssertEqual("-\\n".sw_escape, "-\n")
+        XCTAssertEqual("\\n".sw_escape, "\n")
+        XCTAssertEqual("\\n\\r".sw_escape, "\n\r")
+
+        XCTAssertEqual("\\a".sw_escape, "a")
+        XCTAssertEqual("\\\\".sw_escape, "\\")
+    }
+    
+    func testCapacity() {
+        
+        XCTAssertEqual("2b".sw_capacity, 2)
+        XCTAssertEqual("22B".sw_capacity, 22)
+        
+        XCTAssertEqual("2kb".sw_capacity, 2*1024)
+        XCTAssertEqual("2Kb".sw_capacity, 2*1024)
+        XCTAssertEqual("2mb".sw_capacity, 2*1024*1024)
+        XCTAssertEqual("2Mb".sw_capacity, 2*1024*1024)
+        XCTAssertEqual("2gb".sw_capacity, 2*1024*1024*1024)
+        XCTAssertEqual("2Gb".sw_capacity, 2*1024*1024*1024)
+        XCTAssertEqual("2tb".sw_capacity, 2*1024*1024*1024*1024)
+        XCTAssertEqual("2Tb".sw_capacity, 2*1024*1024*1024*1024)
+        XCTAssertEqual("2pb".sw_capacity, 2*1024*1024*1024*1024*1024)
+        XCTAssertEqual("2Pb".sw_capacity, 2*1024*1024*1024*1024*1024)
     }
 }

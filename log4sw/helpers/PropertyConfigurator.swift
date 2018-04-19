@@ -17,6 +17,7 @@ public class PropertyConfigurator {
             
             self.prase(properties)
         } catch (_) {
+            print("Could not read configuration file [\(url)].")
             //LogLog::error(((LogString) LOG4CXX_STR("Could not read configuration file ["))
             //+ configFileName.getPath() + LOG4CXX_STR("]."));
             
@@ -45,7 +46,20 @@ public class PropertyConfigurator {
 
     }
     
-    func prase(_ properties: Properties) {
+    func prase(_ properties: Properties)  {
+        // hierarchy
+        
+//        let debug = properties["log4j.debug"].sw_boolean ?? false
+//        LogLog::setInternalDebugging(OptionConverter::toBoolean(value, true))
+        
+
+        let threshold = properties["log4j.threshold"].sw_subst(in: properties)
+        if !threshold.isEmpty {
+            // ..
+            // threshold.sw_level ?? .all
+        }
+        
+        // root
         
         
         

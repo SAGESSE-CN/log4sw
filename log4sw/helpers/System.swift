@@ -55,10 +55,10 @@ struct System {
      
      @throws IllegalArgumentException if key is empty.
      */
-    static func env(for key: String) throws -> String? {
+    static func env(for key: String) -> String? {
         switch key {
         case "":
-            throw IllegalArgumentException("key is empty")
+            return ""
             
         case "java.io.tmpdir":
             return NSTemporaryDirectory()
@@ -72,6 +72,12 @@ struct System {
             }
             
             return String(utf8String: buf)
+            
+        case "user.home":
+            return NSHomeDirectory()
+            
+        case "user.name":
+            return NSUserName()
 
         default:
             guard let value = getenv(key) else {

@@ -28,25 +28,25 @@ internal class Properties {
         fileprivate static func parse(_ contents: String, in properties: Properties) {
             
             var type = LexemType.begin
-            var current = contents.startIndex
+            var pos = contents.startIndex
             
             var key = ""
             var element = ""
 
-            while current != contents.endIndex {
-                let ch = contents[current]
+            while pos != contents.endIndex {
+                let ch = contents[pos]
                 switch type {
                 case .begin:
                     switch ch {
                     case " ","\t","\n","\r":
                         // is blank section
                         type = .begin
-                        current = contents.index(after: current)
+                        pos = contents.index(after: pos)
                     
                     case "#","!":
                         // is comment section
                         type = .comment
-                        current = contents.index(after: current)
+                        pos = contents.index(after: pos)
                         
                     default:
                         // is key section
@@ -56,38 +56,38 @@ internal class Properties {
                     switch ch {
                     case "\\":
                         type = .key_escape
-                        current = contents.index(after: current)
+                        pos = contents.index(after: pos)
                         
                     case " ","\t",":","=":
                         type = .delimiter
-                        current = contents.index(after: current)
+                        pos = contents.index(after: pos)
 
                     case "\r","\n":
                         // key associated with an empty string element
                         properties[key] = element
                         key.removeAll()
                         type = .begin
-                        current = contents.index(after: current)
+                        pos = contents.index(after: pos)
 
                     default:
                         // is key contents
                         key.append(ch)
-                        current = contents.index(after: current)
+                        pos = contents.index(after: pos)
                     }
                 case .key_escape:
                     switch ch {
                     case " ","\t",":","=","\\":
                         key.append(ch)
                         type = .key
-                        current = contents.index(after: current)
+                        pos = contents.index(after: pos)
                         
                     case "\r":
                         type = .key_continue2
-                        current = contents.index(after: current)
+                        pos = contents.index(after: pos)
                         
                     case "\n":
                         type = .key_continue
-                        current = contents.index(after: current)
+                        pos = contents.index(after: pos)
                         
                     default:
                         break
@@ -96,7 +96,7 @@ internal class Properties {
                     switch ch {
                     case " ","\t":
                         // is blank
-                        current = contents.index(after: current)
+                        pos = contents.index(after: pos)
 
                     default:
                         type = .key
@@ -105,7 +105,7 @@ internal class Properties {
                     switch ch {
                     case "\n":
                         type = .key_continue
-                        current = contents.index(after: current)
+                        pos = contents.index(after: pos)
 
                     default:
                         type = .key_continue
@@ -114,7 +114,7 @@ internal class Properties {
                     switch ch {
                     case " ","\t",":","=":
                         // is blank
-                        current = contents.index(after: current)
+                        pos = contents.index(after: pos)
 
                     default:
                         type = .element
@@ -123,7 +123,7 @@ internal class Properties {
                     switch ch {
                     case "\\":
                         type = .element_escape
-                        current = contents.index(after: current)
+                        pos = contents.index(after: pos)
 
                     case "\r","\n":
                         // key associated with an empty string element
@@ -131,33 +131,33 @@ internal class Properties {
                         key.removeAll()
                         element.removeAll()
                         type = .begin
-                        current = contents.index(after: current)
+                        pos = contents.index(after: pos)
 
                     default:
                         // is element contents
                         element.append(ch)
-                        current = contents.index(after: current)
+                        pos = contents.index(after: pos)
                     }
                 case .element_escape:
                     switch ch {
                     case "\n":
                         type = .element_continue
-                        current = contents.index(after: current)
+                        pos = contents.index(after: pos)
 
                     case "\r":
                         type = .element_continue2
-                        current = contents.index(after: current)
+                        pos = contents.index(after: pos)
                         
                     default:
                         // is element contents
                         element.append(ch)
-                        current = contents.index(after: current)
+                        pos = contents.index(after: pos)
                     }
                 case .element_continue:
                     switch ch {
                     case " ","\t":
                         // is blank
-                        current = contents.index(after: current)
+                        pos = contents.index(after: pos)
                         
                     default:
                         type = .element
@@ -167,7 +167,7 @@ internal class Properties {
                     case "\n":
                         // is blank line
                         type = .element_continue
-                        current = contents.index(after: current)
+                        pos = contents.index(after: pos)
 
                     default:
                         type = .element_continue
@@ -177,11 +177,11 @@ internal class Properties {
                     case "\r","\n":
                         // comment content is end
                         type = .begin
-                        current = contents.index(after: current)
+                        pos = contents.index(after: pos)
                         
                     default:
                         // ignore
-                        current = contents.index(after: current)
+                        pos = contents.index(after: pos)
                     }
                 }
             }
@@ -228,14 +228,14 @@ internal class Properties {
     /// <code>:</code>, then it is ignored
     /// and any whitespace characters after it are also skipped. All remaining
     /// characters on the line become part of the associated element string.
-    /// Within the element string, the ASCII escape sequences <code>\\t</code>,
+    /// Within the element string, the ASCII sw_escape sequences <code>\\t</code>,
     /// <code>\\n</code>, <code>\\r</code>, <code>\\</code>, <code>\\"</code>,
     /// <code>\\'</code>, <code>\\</code> (a backslash and a space), and
     /// <code>\\uxxxx</code> are recognized
     /// and converted to single characters. Moreover, if the last character on
     /// the line is <code>\\</code>, then the next line is treated as a
     /// continuation of the
-    /// current line; the <code>\\</code> and line terminator are simply
+    /// pos line; the <code>\\</code> and line terminator are simply
     /// discarded, and any
     /// leading whitespace characters on the continuation line are also
     /// discarded and are not part of the element string.
