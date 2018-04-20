@@ -92,8 +92,37 @@ internal extension String {
         return Bool(self.lowercased())
     }
     
-    var sw_level: String? {
-        return nil
+    var sw_level: Level? {
+        guard !self.isEmpty else {
+            // the string is empty
+            return nil
+        }
+        
+        guard let delimiter = self.range(of: "#") else {
+            print("OptionConverter::toLevel: no class name specified, level=[\(self)]")
+            // no class name specified : use standard Level class
+            return Level.level(for: self)
+        }
+        
+        let name = String(self[self.startIndex ..< delimiter.lowerBound])
+        let clazz = String(self[delimiter.upperBound ..< self.endIndex])
+        
+        print("OptionConverter::toLevel: class=[\(clazz)], level=[\(name)]")
+        
+        // This is degenerate case but you never know.
+        guard !name.isEmpty else {
+            return Level.level(for: self)
+        }
+        
+//        Level::LevelClass& levelClass =
+//        (Level::LevelClass&)Loader::loadClass(clazz);
+//        return levelClass.toLevel(levelName);
+
+        return Level.level(for: self)
+    }
+    
+    func sw_equal<T: StringProtocol>(_ s: T) -> Bool {
+        return compare(s, options: .caseInsensitive) == .orderedSame
     }
 
     /**

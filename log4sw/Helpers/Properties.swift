@@ -196,6 +196,7 @@ internal class Properties {
         // nothing
     }
     internal init(contentsOf url: URL) throws {
+        
         // load file
         try self.load(contentsOf: url)
     }
@@ -289,7 +290,6 @@ internal class Properties {
     /// including distinct keys in the default property list if a key
     /// of the same name has not already been found from the main
     /// properties list.
-    /// - Returns: an array of all the keys in this property list, including the keys in the default property list.
     ///
     internal var names: Array<String> {
         return Array(_properties.keys)
