@@ -19,28 +19,17 @@ public protocol Loadable: class {
 
 public class Loader {
     
-    
-    /// Load all support Loadable the class.
-    public static func `load`() -> Dictionary<String, Loadable.Type> {
-        var count = UInt32(0)
-        var result = Dictionary<String, Loadable.Type>()
-        
-        if let types = objc_copyClassList(&count) {
-            for index in 0 ..< Int(count) {
-                // Filter out all types of support Loadable
-                guard let clazz = types[index] as? Loadable.Type else {
-                    continue
-                }
-                result[clazz.FQCN] = clazz
-            }
-        }
-        
-        return result
+    public static func `register`(_ clazz: Loadable.Type) {
+        _registry[clazz.FQCN] = clazz
     }
     
     public static func `class`(_ name: String) -> AnyClass? {
-        print(_registry[name])
         
+        guard let clazz = _registry[name] else {
+            return nil
+        }
+        
+        print(clazz)
         fatalError()
     }
 
@@ -83,6 +72,32 @@ public class Loader {
 //    }
     
     
+    /// Load all support Loadable the class.
+    private static func _load() -> Dictionary<String, Loadable.Type> {
+        var count = UInt32(0)
+        var result = Dictionary<String, Loadable.Type>()
+        
+        // The built-in class must be forced to load once
+        _ = [
+            XMLConfigurator.self,
+            PropertyConfigurator.self,
+            
+            FileAppender.self,
+            RollingFileAppender.self,
+        ]
+        
+        if let types = objc_copyClassList(&count) {
+            for index in 0 ..< Int(count) {
+                // Filter all types of no support Loadable
+                guard let clazz = types[index] as? Loadable.Type else {
+                    continue
+                }
+                result[clazz.FQCN] = clazz
+            }
+        }
+        
+        return result
+    }
     
-    private static let _registry: Dictionary<String, Loadable.Type> = Loader.load()
+    private static var _registry: Dictionary<String, Loadable.Type> = Loader._load()
 }

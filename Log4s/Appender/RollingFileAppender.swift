@@ -7,3 +7,11 @@
 //
 
 import Foundation
+
+open class RollingFileAppender: Loadable {
+    
+    /// The fully qualified name of the class.
+    open class var FQCN: String {
+        return "org.apache.log4j.RollingFileAppender"
+    }
+}
